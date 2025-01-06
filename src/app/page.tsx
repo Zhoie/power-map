@@ -27,6 +27,10 @@ const colorMap = {
   petroleum: '#8B4513'   // saddle brown for petroleum
 };
 
+const isNumber = (value: ValueType | undefined): value is number => {
+  return typeof value === 'number';
+};
+
 export default function Home() {
   const [data, setData] = useState<DataPoint[]>([]);
   const chartRef = useRef<HTMLDivElement>(null);
@@ -176,7 +180,7 @@ export default function Home() {
                             <p className="font-bold">{`Year: ${label}`}</p>
                             {payload.map((entry) => (
                               <p key={entry.name} style={{ color: entry.color }}>
-                                {`${entry.name}: ${entry.value?.toFixed(2)} billion kWh`}
+                                {`${entry.name}: ${isNumber(entry.value) ? entry.value.toFixed(2) : 'N/A'} billion kWh`}
                               </p>
                             ))}
                           </div>
