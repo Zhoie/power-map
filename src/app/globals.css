@@ -5,17 +5,43 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  
+  /* Chart Colors - Remove var() wrapper */
+  --color-coal: #2d3436;
+  --color-naturalGas: #0984e3;
+  --color-nuclear: #00b894;
+  --color-renewables: #00cec9;
+  --color-petroleum: #e17055;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --card: #1a1a1a;
+    --card-foreground: #ededed;
+    --primary: #ffffff;
+    --primary-foreground: #000000;
+    --muted: #262626;
+    --muted-foreground: #a3a3a3;
+    
+    /* Dark mode chart colors */
+    --color-coal: #636e72;
+    --color-naturalGas: #74b9ff;
+    --color-nuclear: #55efc4;
+    --color-renewables: #81ecec;
+    --color-petroleum: #fab1a0;
   }
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, sans-serif;
 }

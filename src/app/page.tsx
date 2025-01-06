@@ -1,101 +1,169 @@
-import Image from "next/image";
+"use client"
+
+import { useState, useEffect, useRef } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { ChartContainer } from "@/components/ui/chart"
+
+interface DataPoint {
+  year: number;
+  coal: number;
+  naturalGas: number;
+  nuclear: number;
+  renewables: number;
+  petroleum: number;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [data, setData] = useState<DataPoint[]>([]);
+  const chartRef = useRef<HTMLDivElement>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+  useEffect(() => {
+    fetch('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Electricity%20Generation%20Major%20Source-jPNbgGj5RdiFlV4x9rYX8d8EESsVU8.csv')
+      .then(response => response.text())
+      .then(csvData => {
+        const rows = csvData.split('\n').slice(1);
+        const processedData = rows.map(row => {
+          const [year, coal, naturalGas, nuclear, renewables, petroleum] = row.split(',');
+          return {
+            year: parseInt(year),
+            coal: parseFloat(coal),
+            naturalGas: parseFloat(naturalGas),
+            nuclear: parseFloat(nuclear),
+            renewables: parseFloat(renewables),
+            petroleum: parseFloat(petroleum)
+          };
+        }).filter(record => !isNaN(record.year));
+        setData(processedData);
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
+
+  const handleDownload = () => {
+    if (chartRef.current) {
+      const svg = chartRef.current.querySelector('svg');
+      if (svg) {
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx?.drawImage(img, 0, 0);
+          const pngFile = canvas.toDataURL('image/png');
+          const downloadLink = document.createElement('a');
+          downloadLink.download = 'electricity-generation-chart.png';
+          downloadLink.href = pngFile;
+          downloadLink.click();
+        };
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+      }
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center p-8">
+      <Card className="w-full max-w-4xl">
+        <CardHeader>
+          <CardTitle>U.S. Electricity Generation by Major Energy Source (1950-2023)</CardTitle>
+          <CardDescription>Data shown in billion kilowatthours</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div ref={chartRef}>
+            <ChartContainer
+              config={{
+                coal: {
+                  label: "Coal",
+                  cssVariable: "--color-coal",
+                },
+                naturalGas: {
+                  label: "Natural Gas",
+                  cssVariable: "--color-naturalGas",
+                },
+                nuclear: {
+                  label: "Nuclear",
+                  cssVariable: "--color-nuclear",
+                },
+                renewables: {
+                  label: "Renewables",
+                  cssVariable: "--color-renewables",
+                },
+                petroleum: {
+                  label: "Petroleum",
+                  cssVariable: "--color-petroleum",
+                },
+              }}
+              className="h-[400px]"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="year" />
+                  <YAxis />
+                  <Tooltip
+                    content={({ active, payload, label }) => {
+                      if (active && payload && payload.length) {
+                        return (
+                          <div className="bg-background border rounded p-2 shadow-md">
+                            <p className="font-bold">{`Year: ${label}`}</p>
+                            {payload.map((entry: any, index: number) => (
+                              <p key={`item-${index}`} style={{ color: entry.color }}>
+                                {`${entry.name}: ${entry.value.toFixed(2)} billion kWh`}
+                              </p>
+                            ))}
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="coal" 
+                    stroke={`var(--color-coal)`} 
+                    name="Coal" 
+                    strokeWidth={2} 
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="naturalGas" 
+                    stroke={`var(--color-naturalGas)`} 
+                    name="Natural Gas" 
+                    strokeWidth={2} 
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="nuclear" 
+                    stroke={`var(--color-nuclear)`} 
+                    name="Nuclear" 
+                    strokeWidth={2} 
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="renewables" 
+                    stroke={`var(--color-renewables)`} 
+                    name="Renewables" 
+                    strokeWidth={2} 
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="petroleum" 
+                    stroke={`var(--color-petroleum)`} 
+                    name="Petroleum" 
+                    strokeWidth={2} 
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <Button onClick={handleDownload}>Download as PNG</Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
-  );
+  )
 }
