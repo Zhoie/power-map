@@ -67,9 +67,16 @@ export default function Home() {
         const ctx = canvas.getContext('2d');
         const img = new Image();
         img.onload = () => {
-          // Set canvas size to accommodate title, chart and legend
-          canvas.width = img.width;
-          canvas.height = img.height + 120; // Extra height for title and legend
+          // Add extra padding for title and legend
+          const padding = {
+            top: 60,    // Space for title
+            bottom: 40, // Space for legend
+            left: 20,   // Left margin
+            right: 20   // Right margin
+          };
+          
+          canvas.width = img.width + padding.left + padding.right;
+          canvas.height = img.height + padding.top + padding.bottom;
           
           if (ctx) {
             // Fill white background
@@ -84,10 +91,10 @@ export default function Home() {
             ctx.font = '14px Arial';
             ctx.fillText('Data shown in billion kilowatthours', canvas.width / 2, 50);
             
-            // Draw chart image
-            ctx.drawImage(img, 0, 80);
+            // Draw chart image with padding
+            ctx.drawImage(img, padding.left, padding.top);
             
-            // Add legend at the bottom
+            // Add legend at the bottom with adjusted position
             const legendItems = [
               { label: 'Coal', color: colorMap.coal },
               { label: 'Natural Gas', color: colorMap.naturalGas },
@@ -96,22 +103,22 @@ export default function Home() {
               { label: 'Petroleum', color: colorMap.petroleum }
             ];
             
-            // Draw legend
+            // Draw legend with adjusted positioning
             ctx.textAlign = 'left';
             ctx.font = '12px Arial';
-            let xOffset = canvas.width / 2 - 250; // Starting position
-            const yPosition = canvas.height - 20;
+            const legendWidth = 500;
+            const spacing = legendWidth / (legendItems.length - 1);
+            let xOffset = (canvas.width - legendWidth) / 2;
+            const yPosition = canvas.height - padding.bottom / 2;
             
             legendItems.forEach(item => {
-              // Draw color box
               ctx.fillStyle = item.color;
               ctx.fillRect(xOffset, yPosition - 10, 15, 15);
               
-              // Draw label
               ctx.fillStyle = '#000000';
               ctx.fillText(item.label, xOffset + 20, yPosition);
               
-              xOffset += 80; // Fixed spacing between items
+              xOffset += spacing;
             });
           }
           
@@ -224,9 +231,9 @@ export default function Home() {
               </ResponsiveContainer>
             </ChartContainer>
           </div>
-          {/* <div className="mt-4 flex justify-center">
+          <div className="mt-4 flex justify-center">
             <Button onClick={handleDownload}>Download as PNG</Button>
-          </div> */}
+          </div>
         </CardContent>
       </Card>
     </div>
