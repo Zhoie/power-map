@@ -15,6 +15,14 @@ interface DataPoint {
   petroleum: number;
 }
 
+const colorMap = {
+  coal: '#333333',      // dark gray for coal
+  naturalGas: '#4169E1', // royal blue for natural gas (changed from orange)
+  nuclear: '#FF0000',    // red for nuclear (changed from royal blue)
+  renewables: '#228B22', // forest green for renewables
+  petroleum: '#8B4513'   // saddle brown for petroleum
+};
+
 export default function Home() {
   const [data, setData] = useState<DataPoint[]>([]);
   const chartRef = useRef<HTMLDivElement>(null);
@@ -42,22 +50,68 @@ export default function Home() {
 
   const handleDownload = () => {
     if (chartRef.current) {
-      const svg = chartRef.current.querySelector('svg');
+      const chartContainer = chartRef.current;
+      const svg = chartContainer.querySelector('svg');
       if (svg) {
-        const svgData = new XMLSerializer().serializeToString(svg);
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         const img = new Image();
         img.onload = () => {
+          // Set canvas size to accommodate title, chart and legend
           canvas.width = img.width;
-          canvas.height = img.height;
-          ctx?.drawImage(img, 0, 0);
+          canvas.height = img.height + 120; // Extra height for title and legend
+          
+          if (ctx) {
+            // Fill white background
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add title
+            ctx.fillStyle = '#000000';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('U.S. Electricity Generation by Major Energy Source (1950-2023)', canvas.width / 2, 30);
+            ctx.font = '14px Arial';
+            ctx.fillText('Data shown in billion kilowatthours', canvas.width / 2, 50);
+            
+            // Draw chart image
+            ctx.drawImage(img, 0, 80);
+            
+            // Add legend at the bottom
+            const legendItems = [
+              { label: 'Coal', color: colorMap.coal },
+              { label: 'Natural Gas', color: colorMap.naturalGas },
+              { label: 'Nuclear', color: colorMap.nuclear },
+              { label: 'Renewables', color: colorMap.renewables },
+              { label: 'Petroleum', color: colorMap.petroleum }
+            ];
+            
+            // Draw legend
+            ctx.textAlign = 'left';
+            ctx.font = '12px Arial';
+            let xOffset = canvas.width / 2 - 250; // Starting position
+            const yPosition = canvas.height - 20;
+            
+            legendItems.forEach(item => {
+              // Draw color box
+              ctx.fillStyle = item.color;
+              ctx.fillRect(xOffset, yPosition - 10, 15, 15);
+              
+              // Draw label
+              ctx.fillStyle = '#000000';
+              ctx.fillText(item.label, xOffset + 20, yPosition);
+              
+              xOffset += 80; // Fixed spacing between items
+            });
+          }
+          
           const pngFile = canvas.toDataURL('image/png');
           const downloadLink = document.createElement('a');
           downloadLink.download = 'electricity-generation-chart.png';
           downloadLink.href = pngFile;
           downloadLink.click();
         };
+        const svgData = new XMLSerializer().serializeToString(svg);
         img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
       }
     }
@@ -76,23 +130,23 @@ export default function Home() {
               config={{
                 coal: {
                   label: "Coal",
-                  cssVariable: "--color-coal",
+                  cssVariable: colorMap.coal,
                 },
                 naturalGas: {
                   label: "Natural Gas",
-                  cssVariable: "--color-naturalGas",
+                  cssVariable: colorMap.naturalGas,
                 },
                 nuclear: {
                   label: "Nuclear",
-                  cssVariable: "--color-nuclear",
+                  cssVariable: colorMap.nuclear,
                 },
                 renewables: {
                   label: "Renewables",
-                  cssVariable: "--color-renewables",
+                  cssVariable: colorMap.renewables,
                 },
                 petroleum: {
                   label: "Petroleum",
-                  cssVariable: "--color-petroleum",
+                  cssVariable: colorMap.petroleum,
                 },
               }}
               className="h-[400px]"
@@ -123,35 +177,35 @@ export default function Home() {
                   <Line 
                     type="monotone" 
                     dataKey="coal" 
-                    stroke={`var(--color-coal)`} 
+                    stroke={colorMap.coal}
                     name="Coal" 
                     strokeWidth={2} 
                   />
                   <Line 
                     type="monotone" 
                     dataKey="naturalGas" 
-                    stroke={`var(--color-naturalGas)`} 
+                    stroke={colorMap.naturalGas}
                     name="Natural Gas" 
                     strokeWidth={2} 
                   />
                   <Line 
                     type="monotone" 
                     dataKey="nuclear" 
-                    stroke={`var(--color-nuclear)`} 
+                    stroke={colorMap.nuclear}
                     name="Nuclear" 
                     strokeWidth={2} 
                   />
                   <Line 
                     type="monotone" 
                     dataKey="renewables" 
-                    stroke={`var(--color-renewables)`} 
+                    stroke={colorMap.renewables}
                     name="Renewables" 
                     strokeWidth={2} 
                   />
                   <Line 
                     type="monotone" 
                     dataKey="petroleum" 
-                    stroke={`var(--color-petroleum)`} 
+                    stroke={colorMap.petroleum}
                     name="Petroleum" 
                     strokeWidth={2} 
                   />
