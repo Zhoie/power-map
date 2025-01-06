@@ -29,16 +29,11 @@ export function ChartContainer({ config, children, className }: ChartContainerPr
 
     try {
       const computedVars = Object.entries(config).reduce<Record<string, string>>((acc, [key, value]) => {
-        try {
-          const color = window.getComputedStyle(document.documentElement).getPropertyValue(value.cssVariable);
-          acc[`--color-${key}`] = color || value.cssVariable;
-        } catch (e) {
-          acc[`--color-${key}`] = value.cssVariable;
-        }
+        acc[`--color-${key}`] = value.cssVariable;
         return acc;
       }, {});
       setStyleVars(computedVars);
-    } catch (e) {
+    } catch {
       // Fallback to using raw CSS variables if computation fails
       const fallbackVars = Object.entries(config).reduce<Record<string, string>>((acc, [key, value]) => {
         acc[`--color-${key}`] = value.cssVariable;

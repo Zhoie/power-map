@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { ChartContainer } from "@/components/ui/chart"
+import { TooltipProps } from 'recharts';
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 interface DataPoint {
   year: number;
@@ -14,6 +16,14 @@ interface DataPoint {
   renewables: number;
   petroleum: number;
 }
+
+interface TooltipPayloadItem {
+  name: string;
+  value: number;
+  color: string;
+}
+
+type CustomTooltipProps = TooltipProps<ValueType, NameType>;
 
 const colorMap = {
   coal: '#333333',      // dark gray for coal
@@ -157,14 +167,15 @@ export default function Home() {
                   <XAxis dataKey="year" />
                   <YAxis />
                   <Tooltip
-                    content={({ active, payload, label }) => {
+                    content={(props: CustomTooltipProps) => {
+                      const { active, payload, label } = props;
                       if (active && payload && payload.length) {
                         return (
                           <div className="bg-background border rounded p-2 shadow-md">
                             <p className="font-bold">{`Year: ${label}`}</p>
-                            {payload.map((entry: any, index: number) => (
-                              <p key={`item-${index}`} style={{ color: entry.color }}>
-                                {`${entry.name}: ${entry.value.toFixed(2)} billion kWh`}
+                            {payload.map((entry) => (
+                              <p key={entry.name} style={{ color: entry.color }}>
+                                {`${entry.name}: ${entry.value?.toFixed(2)} billion kWh`}
                               </p>
                             ))}
                           </div>
@@ -213,9 +224,9 @@ export default function Home() {
               </ResponsiveContainer>
             </ChartContainer>
           </div>
-          <div className="mt-4 flex justify-center">
+          {/* <div className="mt-4 flex justify-center">
             <Button onClick={handleDownload}>Download as PNG</Button>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
     </div>
