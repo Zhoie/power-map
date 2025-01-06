@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# U.S. Electricity Generation Visualization (1950-2023)
 
-## Getting Started
+An interactive visualization of historical U.S. electricity generation data across major energy sources, built with Next.js and Recharts.
 
-First, run the development server:
+## 🔗 Live Demo
 
+Check out the live demo: [https://power-map.vercel.app](https://power-map.vercel.app)
+
+## 📊 Features
+
+- Interactive line chart visualization
+- Data from 1950 to 2023
+- Major energy sources tracked:
+  - Coal
+  - Natural Gas
+  - Nuclear
+  - Renewables
+  - Petroleum
+- Interactive tooltips with precise values
+- Download chart as PNG functionality
+- Responsive design with dark/light mode support
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js 14
+- **Visualization:** Recharts
+- **Styling:** Tailwind CSS
+- **Typography:** Geist Font
+- **Language:** TypeScript
+
+## 🚀 Getting Started
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/power-map.git
+cd power-map
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Run the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Learn More
+## 📝 Data Source
 
-To learn more about Next.js, take a look at the following resources:
+The electricity generation data is sourced from the U.S. Energy Information Administration (EIA), covering annual statistics from 1950 to 2023. All measurements are in billion kilowatthours.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📦 Building for Production
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run build
+npm start
+```
 
-## Deploy on Vercel
+## 📄 License
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT License
