@@ -17,12 +17,6 @@ interface DataPoint {
   petroleum: number;
 }
 
-interface TooltipPayloadItem {
-  name: string;
-  value: number;
-  color: string;
-}
-
 type CustomTooltipProps = TooltipProps<ValueType, NameType>;
 
 const colorMap = {
